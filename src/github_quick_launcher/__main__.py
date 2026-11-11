@@ -15,6 +15,9 @@ from github_quick_launcher.settings import Settings
 plugin = Plugin()
 
 RETIRE_GRACE_SECONDS = 30.0
+# Flow keeps each plugin's settings in a folder named after plugin.json's
+# Name; the cache lives beside them, so the two must stay in step.
+PLUGIN_DIR_NAME = "Github Launcher"
 
 _service: Optional[RepoService] = None
 _service_settings: Optional[Settings] = None
@@ -32,7 +35,7 @@ def _cache_dir(root_dir: Path, env: Mapping[str, str]) -> Path:
     appdata = env.get("APPDATA")
     if appdata:
         return (Path(appdata) / "FlowLauncher" / "Settings" / "Plugins"
-                / "Github Quick Launcher" / "cache")
+                / PLUGIN_DIR_NAME / "cache")
     return root_dir / ".cache"
 
 

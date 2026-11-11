@@ -1,7 +1,7 @@
 {
   "ID": "6DDD6B0E38D04F6697F655A460F5FC65",
   "ActionKeyword": "gr",
-  "Name": "Github Quick Launcher",
+  "Name": "Github Launcher",
   "Description": "自分のリポジトリやスターに素早くアクセスし、GitHub 全体も検索できます。",
   "Author": "Fuku856 (original by Garulf)",
   "Version": "5.0.0",

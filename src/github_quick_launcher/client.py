@@ -236,7 +236,7 @@ def build_http(token: str) -> HttpClient:
         "Accept": "application/vnd.github+json",
         "Accept-Encoding": "gzip",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "Github-Quick-Launcher",
+        "User-Agent": "Github-Launcher",
     }
     if token:
         headers["Authorization"] = f"Bearer {token}"

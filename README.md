@@ -1,4 +1,4 @@
-# Github-Quick-Launcher
+# Github Launcher
 
 Quickly access your GitHub repositories and stars from Flow Launcher, with privacy-friendly defaults and a small, fast footprint.
 
@@ -14,7 +14,7 @@ Quickly access your GitHub repositories and stars from Flow Launcher, with priva
 2. Extract it into a new folder under `%APPDATA%\FlowLauncher\Plugins`.
 3. Restart Flow Launcher.
 
-`pm install github quick launcher` installs the original plugin, not this one. This version has its own plugin ID, so Flow Launcher will not replace it with the original when that one updates.
+Once the plugin is listed in Flow Launcher's plugin store, `pm install github launcher` installs it, and Flow Launcher keeps it up to date. `pm install github quick launcher` installs the original plugin instead; this one has its own name and plugin ID, so the two never replace each other.
 
 ## Usage
 
@@ -68,7 +68,7 @@ The plugin talks only to GitHub and sends no telemetry.
 
 - **Queries.** Filtering `/` and `*` runs locally. A global query is sent to GitHub's search API only after three characters and a short pause in typing, and never when *Search all of GitHub as you type* is off. With a token set, GitHub sees these searches as yours.
 - **Avatars.** Owner avatars are loaded from `avatars.githubusercontent.com`, resized to what your display needs. Turn *Show owner avatars* off to load no images.
-- **Cache.** Your repository and star lists are stored under `%APPDATA%\FlowLauncher\Settings\Plugins\Github Quick Launcher\cache`. Lists fetched with a token include private repository names. They are deleted when you change or remove the username or token, and `gr !clear` deletes them at any time.
+- **Cache.** Your repository and star lists are stored under `%APPDATA%\FlowLauncher\Settings\Plugins\Github Launcher\cache`. Lists fetched with a token include private repository names. They are deleted when you change or remove the username or token, and `gr !clear` deletes them at any time.
 - **Token.** Flow Launcher stores plugin settings, including the token, unencrypted in its settings folder. The plugin masks tokens in its own log.
 
 ## Contributing

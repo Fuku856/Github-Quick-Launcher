@@ -13,7 +13,14 @@ from github_quick_launcher.__main__ import _cache_dir
 def test_cache_dir_prefers_appdata(tmp_path: Path):
     result = _cache_dir(tmp_path / "plugin-root", {"APPDATA": str(tmp_path)})
     assert result == (
-        tmp_path / "FlowLauncher" / "Settings" / "Plugins" / "Github Quick Launcher" / "cache")
+        tmp_path / "FlowLauncher" / "Settings" / "Plugins" / "Github Launcher" / "cache")
+
+
+def test_cache_folder_follows_the_plugin_name_flow_uses():
+    import json
+    manifest = Path(__file__).resolve().parent.parent / "data" / "plugin.json"
+    name = json.loads(manifest.read_text(encoding="utf-8"))["Name"]
+    assert main.PLUGIN_DIR_NAME == name
 
 
 def test_cache_dir_falls_back_to_plugin_root(tmp_path: Path):

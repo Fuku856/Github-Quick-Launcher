@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-PLUGIN_NAME = "Github Quick Launcher"
+PLUGIN_NAME = "Github Launcher"
 
 # Context menu: (title, subtitle). A subtitle of None shows the copied value.
 MENU_OPEN_BROWSER = ("ブラウザで開く", "リポジトリをブラウザで開きます")
