@@ -4,7 +4,7 @@
   "Name": "Github Launcher",
   "Description": "自分のリポジトリやスターに素早くアクセスし、GitHub 全体も検索できます。",
   "Author": "Fuku856 (original by Garulf)",
-  "Version": "5.0.0",
+  "Version": "5.1.0",
   "Language": "python_v2",
   "Website": "https://github.com/Fuku856/Github-Quick-Launcher",
   "IcoPath": "icon.png",
