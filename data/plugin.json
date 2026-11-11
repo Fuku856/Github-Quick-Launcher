@@ -1,12 +1,12 @@
 {
-  "ID": "240B648F33DD4105800747A2749E1B5C",
+  "ID": "6DDD6B0E38D04F6697F655A460F5FC65",
   "ActionKeyword": "gr",
   "Name": "Github Quick Launcher",
   "Description": "自分のリポジトリやスターに素早くアクセスし、GitHub 全体も検索できます。",
-  "Author": "Garulf",
+  "Author": "Fuku856 (original by Garulf)",
   "Version": "5.0.0",
   "Language": "python_v2",
-  "Website": "https://github.com/Garulf/github-quick-launcher",
+  "Website": "https://github.com/Fuku856/Github-Quick-Launcher",
   "IcoPath": "icon.png",
   "ExecuteFileName": "run.py"
 }

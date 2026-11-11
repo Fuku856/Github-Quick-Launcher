@@ -5,7 +5,8 @@ build-backend = "hatchling.build"
 [project]
 name = "github-quick-launcher"
 authors = [
-    {name = "Garulf"}
+    {name = "Fuku856"},
+    {name = "Garulf"},
 ]
 version = "5.0.0" # x-release-please-version
 description = "Quickly access your personal repositories and stars from Flow Launcher"
@@ -16,7 +17,8 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/Garulf/Github-Quick-Launcher"
+Repository = "https://github.com/Fuku856/Github-Quick-Launcher"
+Upstream = "https://github.com/Garulf/Github-Quick-Launcher"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/github_quick_launcher"]
