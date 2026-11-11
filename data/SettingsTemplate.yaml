@@ -17,9 +17,9 @@ body:
     attributes:
       name: cache_ttl_minutes
       label: "キャッシュの有効期間（分）:"
-      defaultValue: "10"
+      defaultValue: "360"
       description: >
-        リポジトリ一覧を使い回す時間です。過ぎるとバックグラウンドで更新します。
+        リポジトリとスターの一覧を使い回す時間です。過ぎると次に使ったときにバックグラウンドで更新します。絞り込みで 1 件も見つからないときや、検索で一覧にない自分のリポジトリが見つかったときは、期限前でも更新します（1 分に 1 回まで）。
   - type: checkbox
     attributes:
       name: online_search
