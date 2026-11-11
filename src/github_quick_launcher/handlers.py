@@ -12,6 +12,7 @@ from pyflowlauncher.plugin import _default_context_menu
 from pyflowlauncher.string_matcher import DEFAULT_QUERY_SEARCH_PRECISION, string_matcher
 
 from github_quick_launcher import avatar
+from github_quick_launcher import messages as msg
 from github_quick_launcher.client import (
     BadCredentials, GitHubError, NotFound, Offline, RateLimited, Repo,
 )
@@ -80,21 +81,21 @@ def build(plugin: Plugin, service_for: Callable[[], RepoService]) -> Handlers:
         desktop = f"x-github-client://openRepo/{quote_plus(repo.full_name)}"
         vscode = f"vscode://vscode.git/clone?url={quote_plus(repo.html_url)}"
         return [
-            Result("Open in browser", "Open repository in browser",
+            Result(*msg.MENU_OPEN_BROWSER,
                    icons.browser).add_action(api.open_url(repo.html_url)),
-            Result("Open with GitHub Desktop", "Open repository in GitHub Desktop",
+            Result(*msg.MENU_OPEN_DESKTOP,
                    icons.open).add_action(api.open_url(desktop)),
-            Result("Open in VS Code", "Open repository in VS Code",
+            Result(*msg.MENU_OPEN_VSCODE,
                    icons.open).add_action(api.open_url(vscode)),
-            Result("Copy full name", repo.full_name,
+            Result(msg.MENU_COPY_NAME, repo.full_name,
                    icons.copy).add_action(api.copy_to_clipboard(repo.full_name)),
-            Result("Copy URL", repo.html_url,
+            Result(msg.MENU_COPY_URL, repo.html_url,
                    icons.copy).add_action(api.copy_to_clipboard(repo.html_url)),
-            Result("Clone with HTTPS", https_clone,
+            Result(msg.MENU_CLONE_HTTPS, https_clone,
                    icons.copy).add_action(api.copy_to_clipboard(https_clone)),
-            Result("Clone with SSH", ssh_clone,
+            Result(msg.MENU_CLONE_SSH, ssh_clone,
                    icons.copy).add_action(api.copy_to_clipboard(ssh_clone)),
-            Result("Clone with GitHub CLI", cli_clone,
+            Result(msg.MENU_CLONE_CLI, cli_clone,
                    icons.copy).add_action(api.copy_to_clipboard(cli_clone)),
         ]
 
@@ -135,8 +136,8 @@ def build(plugin: Plugin, service_for: Callable[[], RepoService]) -> Handlers:
 
     def settings_prompt() -> Result:
         return Result(
-            title="Set your GitHub username or token",
-            subtitle="Press Enter to open settings, then \"/\" lists your repositories",
+            title=msg.SETTINGS_PROMPT_TITLE,
+            subtitle=msg.SETTINGS_PROMPT_SUBTITLE,
             icon=PLUGIN_ICON,
             score=PROMPT_SCORE,
         ).add_action(api.open_setting_dialog())
@@ -145,26 +146,25 @@ def build(plugin: Plugin, service_for: Callable[[], RepoService]) -> Handlers:
         if isinstance(error, RateLimited):
             resets = time.strftime("%H:%M", time.localtime(error.reset_at))
             return Result(
-                "GitHub rate limit reached",
-                f"Resets at {resets}. Press Enter to add a token in settings and raise the limit",
+                msg.RATE_LIMIT_TITLE,
+                msg.RATE_LIMIT_SUBTITLE.format(resets=resets),
                 PLUGIN_ICON,
             ).add_action(api.open_setting_dialog())
         if isinstance(error, BadCredentials):
             return Result(
-                "GitHub rejected your token",
-                "Press Enter to open settings and replace it",
+                msg.BAD_TOKEN_TITLE,
+                msg.BAD_TOKEN_SUBTITLE,
                 PLUGIN_ICON,
             ).add_action(api.open_setting_dialog())
         if isinstance(error, NotFound):
             return Result(
-                "GitHub user not found",
-                "Press Enter to open settings and check the username",
+                msg.USER_NOT_FOUND_TITLE,
+                msg.USER_NOT_FOUND_SUBTITLE,
                 PLUGIN_ICON,
             ).add_action(api.open_setting_dialog())
         if isinstance(error, Offline):
-            return Result("Can't reach GitHub", "Check your connection and try again",
-                          PLUGIN_ICON)
-        return Result("GitHub request failed", str(error), PLUGIN_ICON)
+            return Result(msg.OFFLINE_TITLE, msg.OFFLINE_SUBTITLE, PLUGIN_ICON)
+        return Result(msg.REQUEST_FAILED_TITLE, str(error), PLUGIN_ICON)
 
     async def debounced_search(service: RepoService, q: str) -> List[Repo]:
         # The host cancels this task when the user keeps typing, so requests
@@ -175,22 +175,21 @@ def build(plugin: Plugin, service_for: Callable[[], RepoService]) -> Handlers:
     async def refresh_cache() -> Any:
         service = service_for()
         if not service.has_identity:
-            return api.show_msg(
-                "Github Quick Launcher", "Set your GitHub username or token first")
+            return api.show_msg(msg.PLUGIN_NAME, msg.NEED_IDENTITY_MSG)
         try:
             await service.refresh_all()
         except GitHubError as error:
-            return api.show_msg("Github Quick Launcher", error_result(error).title)
-        return api.show_msg("Github Quick Launcher", "Repository cache refreshed")
+            return api.show_msg(msg.PLUGIN_NAME, error_result(error).title)
+        return api.show_msg(msg.PLUGIN_NAME, msg.REFRESHED_MSG)
 
     def clear_cache() -> Any:
         service_for().clear_cache()
-        return api.show_msg("Github Quick Launcher", "Cached repository lists deleted")
+        return api.show_msg(msg.PLUGIN_NAME, msg.CLEARED_MSG)
 
     def online_search_disabled() -> Result:
         return Result(
-            "Online search is off",
-            "Only your cached repositories are searched. Press Enter to change this in settings",
+            msg.ONLINE_OFF_TITLE,
+            msg.ONLINE_OFF_SUBTITLE,
             PLUGIN_ICON,
         ).add_action(api.open_setting_dialog())
 
@@ -202,16 +201,16 @@ def build(plugin: Plugin, service_for: Callable[[], RepoService]) -> Handlers:
 
         if isinstance(parsed, Clear):
             yield Result(
-                "Delete cached repository lists",
-                "Remove your repositories and stars stored on this PC",
+                msg.CLEAR_TITLE,
+                msg.CLEAR_SUBTITLE,
                 PLUGIN_ICON,
             ).add_action(clear_cache)
             return
 
         if isinstance(parsed, Refresh):
             yield Result(
-                "Refresh repository cache",
-                "Fetch your repositories and stars from GitHub again",
+                msg.REFRESH_TITLE,
+                msg.REFRESH_SUBTITLE,
                 PLUGIN_ICON,
             ).add_action(refresh_cache)
             return

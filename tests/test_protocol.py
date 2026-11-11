@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from github_quick_launcher import messages as msg
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -50,6 +52,6 @@ def test_plugin_answers_queries_over_the_v2_protocol(tmp_path):
 
     assert responses[1]["error"] is None
     prompt = responses[2]["result"]["result"]
-    assert [item["Title"] for item in prompt] == ["Set your GitHub username or token"]
+    assert [item["Title"] for item in prompt] == [msg.SETTINGS_PROMPT_TITLE]
     refresh = responses[3]["result"]["result"]
     assert refresh[0]["JsonRPCAction"]["Method"] == "refresh_cache"

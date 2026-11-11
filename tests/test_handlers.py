@@ -8,6 +8,7 @@ from pyflowlauncher.jsonrpc import _json_default
 from pyflowlauncher.launcher import FlowLauncherV2
 
 from github_quick_launcher import handlers
+from github_quick_launcher import messages as msg
 from github_quick_launcher.client import GitHubError, NotFound, Offline, RateLimited, Repo
 from github_quick_launcher.settings import Settings
 
@@ -128,14 +129,14 @@ async def test_global_search_failure_keeps_own_matches_and_explains(monkeypatch)
     service = FakeService()
     service.search_error = Offline("down")
     found = await titles(build(service, monkeypatch), "flow")
-    assert found == ["me/flow-thing", "Can't reach GitHub"]
+    assert found == ["me/flow-thing", msg.OFFLINE_TITLE]
 
 
 async def test_stale_list_with_failed_refresh_appends_the_error(monkeypatch):
     service = FakeService()
     service.last_error = RateLimited(1700000000)
     found = await titles(build(service, monkeypatch), "/")
-    assert found == ["me/flow-thing", "me/other", "GitHub rate limit reached"]
+    assert found == ["me/flow-thing", "me/other", msg.RATE_LIMIT_TITLE]
 
 
 async def test_repo_result_opens_url_and_carries_a_context_menu(monkeypatch):
@@ -160,15 +161,15 @@ async def test_refresh_command_offers_a_refresh_action(monkeypatch):
 def test_error_results_cover_every_github_error():
     plugin = Plugin(launcher=FlowLauncherV2())
     built = handlers.build(plugin, lambda: FakeService())
-    assert built.error_result(RateLimited(0)).title == "GitHub rate limit reached"
-    assert built.error_result(GitHubError("HTTP 500")).title == "GitHub request failed"
+    assert built.error_result(RateLimited(0)).title == msg.RATE_LIMIT_TITLE
+    assert built.error_result(GitHubError("HTTP 500")).title == msg.REQUEST_FAILED_TITLE
 
 
 def test_not_found_points_at_the_username_setting():
     built = handlers.build(Plugin(launcher=FlowLauncherV2()), lambda: FakeService())
     result = built.error_result(NotFound("missing"))
-    assert result.title == "GitHub user not found"
-    assert result.subtitle == "Press Enter to open settings and check the username"
+    assert result.title == msg.USER_NOT_FOUND_TITLE
+    assert result.subtitle == msg.USER_NOT_FOUND_SUBTITLE
     assert result.json_rpc_action["Method"].endswith("OpenSettingDialog")
 
 
@@ -180,7 +181,7 @@ async def test_refresh_failure_reports_the_error_instead_of_hiding_it(monkeypatc
     command = await built.refresh_cache()
 
     assert command["Method"].endswith("ShowMsg")
-    assert command["Parameters"][1] == "Can't reach GitHub"
+    assert command["Parameters"][1] == msg.OFFLINE_TITLE
 
 
 async def test_refresh_without_identity_asks_for_settings_instead(monkeypatch):
@@ -190,7 +191,7 @@ async def test_refresh_without_identity_asks_for_settings_instead(monkeypatch):
     command = await built.refresh_cache()
 
     assert command["Method"].endswith("ShowMsg")
-    assert command["Parameters"][1] == "Set your GitHub username or token first"
+    assert command["Parameters"][1] == msg.NEED_IDENTITY_MSG
     assert service.refreshed is False
 
 
@@ -202,8 +203,9 @@ async def test_context_menu_is_built_lazily_from_the_echoed_context_data(monkeyp
     menu = built.context_menu(wire["ContextData"])
 
     assert [item.title for item in menu] == [
-        "Open in browser", "Open with GitHub Desktop", "Open in VS Code", "Copy full name",
-        "Copy URL", "Clone with HTTPS", "Clone with SSH", "Clone with GitHub CLI",
+        msg.MENU_OPEN_BROWSER[0], msg.MENU_OPEN_DESKTOP[0], msg.MENU_OPEN_VSCODE[0],
+        msg.MENU_COPY_NAME, msg.MENU_COPY_URL,
+        msg.MENU_CLONE_HTTPS, msg.MENU_CLONE_SSH, msg.MENU_CLONE_CLI,
     ]
     assert menu[0].json_rpc_action["Method"].endswith("OpenUrl")
     assert menu[0].json_rpc_action["Parameters"][0] == FLOW.html_url
@@ -258,7 +260,7 @@ async def test_online_search_off_keeps_global_queries_local(monkeypatch):
     built = build(service, monkeypatch)
 
     assert await titles(built, "flow") == ["me/flow-thing"]
-    assert await titles(built, "garulf/flow") == ["Online search is off"]
+    assert await titles(built, "garulf/flow") == [msg.ONLINE_OFF_TITLE]
     assert service.searched == []
 
 
@@ -286,3 +288,12 @@ async def test_clear_command_deletes_cached_lists(monkeypatch):
     command = built.clear_cache()
     assert service.cleared is True
     assert command["Method"].endswith("ShowMsg")
+
+
+def test_settings_template_is_utf8_and_keeps_the_setting_keys():
+    from pathlib import Path
+    template = Path(__file__).resolve().parent.parent / "data" / "SettingsTemplate.yaml"
+    text = template.read_text(encoding="utf-8")
+    names = [line.split(":", 1)[1].strip() for line in text.splitlines()
+             if line.strip().startswith("name:")]
+    assert names == ["username", "token", "cache_ttl_minutes", "online_search", "show_avatars"]

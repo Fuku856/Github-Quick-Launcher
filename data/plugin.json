@@ -2,7 +2,7 @@
   "ID": "240B648F33DD4105800747A2749E1B5C",
   "ActionKeyword": "gr",
   "Name": "Github Quick Launcher",
-  "Description": "Quickly access your personal repositories and stars.",
+  "Description": "自分のリポジトリやスターに素早くアクセスし、GitHub 全体も検索できます。",
   "Author": "Garulf",
   "Version": "5.0.0",
   "Language": "python_v2",

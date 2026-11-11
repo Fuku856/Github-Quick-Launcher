@@ -9,6 +9,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Awaitable, Callable, Iterable, List, Optional
 
+from github_quick_launcher import messages as msg
 from github_quick_launcher.client import GitHubError, Listing, RateLimited, Repo
 
 Fetch = Callable[[Optional[str]], Awaitable[Listing]]
@@ -118,7 +119,7 @@ class RepoStore:
             self._record_failure(exc)
         except Exception as exc:
             _LOGGER.exception("Unexpected error refreshing repo cache")
-            error = GitHubError(f"Refresh failed: {exc}")
+            error = GitHubError(msg.REFRESH_FAILED_ERROR.format(error=exc))
             error.__cause__ = exc
             self._record_failure(error)
 

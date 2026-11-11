@@ -2,35 +2,35 @@ body:
   - type: input
     attributes:
       name: username
-      label: "GitHub username:"
+      label: "GitHub ユーザー名:"
       defaultValue: ""
       description: >
-        Your GitHub username. With this set, typing "/" lists your public repositories and "*" lists your public stars. Not needed if you provide a token.
+        GitHub のユーザー名です。設定すると「/」で公開リポジトリ、「*」で公開スターを一覧できます。トークンを設定する場合は不要です。
   - type: passwordBox
     attributes:
       name: token
       label: "Personal access token:"
       defaultValue: ""
       description: >
-        Optional. Adds private and organization repositories and raises the GitHub API rate limit. A token with minimal scopes is enough; allow read:org to include organization repositories.
+        任意。プライベート・組織のリポジトリも一覧でき、GitHub API の利用上限も上がります。有効期限付きの Fine-grained トークン（Metadata の読み取りのみ）がおすすめです。Classic トークンならスコープ不要、組織のリポジトリを含めるには read:org を許可してください。トークンは Flow Launcher の設定フォルダーに暗号化されずに保存されます。
   - type: input
     attributes:
       name: cache_ttl_minutes
-      label: "Cache lifetime (minutes):"
+      label: "キャッシュの有効期間（分）:"
       defaultValue: "10"
       description: >
-        How long your repository list is reused before it is refreshed in the background.
+        リポジトリ一覧を使い回す時間です。過ぎるとバックグラウンドで更新します。
   - type: checkbox
     attributes:
       name: online_search
-      label: "Search all of GitHub as you type"
+      label: "入力に合わせて GitHub 全体を検索する"
       defaultValue: "true"
       description: >
-        When on, a query of three or more characters is also sent to GitHub's search API. Turn off to search only your cached repositories; nothing you type is sent to GitHub.
+        オンにすると、3 文字以上の入力を GitHub の検索 API にも送信します。オフにするとキャッシュ済みの自分のリポジトリだけを検索し、入力内容は GitHub に送信されません。
   - type: checkbox
     attributes:
       name: show_avatars
-      label: "Show owner avatars"
+      label: "オーナーのアバターを表示する"
       defaultValue: "true"
       description: >
-        Loads a small owner avatar from GitHub for each result. Turn off to use the plugin icon and load no images.
+        各結果に GitHub からオーナーのアバター（表示倍率に合わせた小さいサイズ）を読み込みます。オフにするとプラグインのアイコンを使い、画像を読み込みません。

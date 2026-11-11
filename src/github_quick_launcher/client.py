@@ -13,6 +13,8 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Mapping, Optional
 from urllib.parse import urlencode
 
+from github_quick_launcher import messages as msg
+
 API_HOST = "api.github.com"
 API_URL = f"https://{API_HOST}"
 PER_PAGE = 100
@@ -197,7 +199,7 @@ class HttpClient:
             try:
                 body = _decode(body, response_headers.get("content-encoding"))
             except zlib.error as exc:
-                raise GitHubError("GitHub sent a response that could not be decoded") from exc
+                raise GitHubError(msg.UNDECODABLE_ERROR) from exc
             return Response(raw.status, response_headers, body)
         raise Offline("connection closed")  # pragma: no cover - loop always returns
 
@@ -217,7 +219,7 @@ def _target(url: str, params: Optional[Mapping[str, Any]]) -> str:
     if url.startswith(API_URL + "/"):
         url = url[len(API_URL):]
     elif not url.startswith("/"):
-        raise GitHubError("Refusing to send a request outside the GitHub API")
+        raise GitHubError(msg.OUTSIDE_API_ERROR)
     if params:
         url += ("&" if "?" in url else "?") + urlencode(params)
     return url
@@ -255,7 +257,7 @@ def _raise_for_status(response: Response) -> None:
         retry_after = _retry_after_seconds(response)
         if retry_after is not None:
             raise RateLimited(int(_now()) + retry_after)
-    raise GitHubError(f"GitHub returned HTTP {status}")
+    raise GitHubError(msg.HTTP_STATUS_ERROR.format(status=status))
 
 
 def _retry_after_seconds(response: Response) -> Optional[int]:
@@ -285,7 +287,7 @@ class GitHubClient:
         try:
             return response.json()
         except ValueError as exc:
-            raise GitHubError("GitHub sent a response that is not JSON") from exc
+            raise GitHubError(msg.NOT_JSON_ERROR) from exc
 
     async def list_repos(self, path: str, etag: Optional[str] = None) -> Listing:
         """Fetch every page of a repository list, or report it unchanged.
