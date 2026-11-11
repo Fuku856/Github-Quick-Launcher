@@ -1,5 +1,26 @@
 # Changelog
 
+## [5.1.0](https://github.com/Fuku856/Github-Quick-Launcher/compare/v5.0.0...v5.1.0) (2026-11-11)
+
+
+### Features
+
+* cache lists for six hours and refresh early on a miss ([1232bce](https://github.com/Fuku856/Github-Quick-Launcher/commit/1232bce2059f1488dd2b03872c387caba559d017))
+* keep queries, avatars and cached lists private by default ([f45b0f2](https://github.com/Fuku856/Github-Quick-Launcher/commit/f45b0f2105bf2d9202e989f850328fdab09ba3f4))
+* rename the plugin to Github Launcher ([0cc6022](https://github.com/Fuku856/Github-Quick-Launcher/commit/0cc602201d93bb5521c805ad201462af8a977b7c))
+* show settings and results in Japanese ([0b70413](https://github.com/Fuku856/Github-Quick-Launcher/commit/0b7041349a7aba28a0d1e5cafc3282af3955a193))
+
+
+### Bug Fixes
+
+* revalidate every page of a repository list, not just the first ([3735392](https://github.com/Fuku856/Github-Quick-Launcher/commit/3735392da8f31e8484f4812b30df6a21fd3443f2))
+
+
+### Performance Improvements
+
+* build context menus lazily and cap results per query ([5d79b29](https://github.com/Fuku856/Github-Quick-Launcher/commit/5d79b297d168a98cc684021f3526bc4af6fd8576))
+* replace httpx with a small standard-library client ([7481abc](https://github.com/Fuku856/Github-Quick-Launcher/commit/7481abc3f310053eaf645df227f44b1cd7dd1dbd))
+
 ## [5.0.0](https://github.com/Garulf/Github-Quick-Launcher/compare/v4.0.0...v5.0.0) (2026-09-19)
 
 
