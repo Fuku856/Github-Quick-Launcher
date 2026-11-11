@@ -67,6 +67,15 @@ jobs:
             --python-version 3.9 \
             --only-binary=:all:
 
+      - name: Trim files the plugin never loads
+        shell: bash
+        # Console scripts and install metadata are only used by pip; nothing
+        # imports them at runtime, so they would only make the archive bigger.
+        run: |
+          site="${{ steps.stage.outputs.build_dir }}/site-packages"
+          rm -rf "$site/bin" "$site"/*.dist-info
+          find "$site" -name "__pycache__" -type d -prune -exec rm -rf {} +
+
       - name: Create release archive
         id: archive
         shell: bash

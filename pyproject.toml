@@ -13,7 +13,6 @@ requires-python = ">=3.9"
 license = { text = "MIT" }
 dependencies = [
     "pyflowlauncher>=1.2.1",
-    "httpx",
 ]
 
 [project.urls]
@@ -26,7 +25,6 @@ packages = ["src/github_quick_launcher"]
 dev = [
     "pytest",
     "pytest-asyncio",
-    "pytest-httpx",
     "flake8",
     "mypy",
     "tox",
