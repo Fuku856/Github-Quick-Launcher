@@ -131,7 +131,7 @@ async def test_list_repos_follows_pagination(client, server):
     listing = await client.list_repos("/user/repos")
 
     assert [repo.full_name for repo in listing.repos] == ["me/one", "me/two"]
-    assert listing.etag == '"v1"'
+    assert listing.etag is None  # page 2 had no ETag, so it cannot be revalidated
     assert listing.repos[0] == Repo(
         "me/one", "", "https://github.com/me/one", "https://avatars.example/me")
 
@@ -169,11 +169,57 @@ async def test_list_repos_sends_etag_and_reports_not_modified(client, server):
     # GitHub keeps Content-Encoding on a 304 even though there is no body.
     server.add(FIRST_PAGE, status=304, headers={"Content-Encoding": "gzip"})
 
-    listing = await client.list_repos("/user/repos", etag='"v1"')
+    listing = await client.list_repos("/user/repos", etag='pages:"v1"')
 
     assert listing.repos is None
-    assert listing.etag == '"v1"'
+    assert listing.etag == 'pages:"v1"'
     assert server.requests[0][1]["If-None-Match"] == '"v1"'
+
+
+SECOND_PAGE = "/user/repos?per_page=100&sort=updated&page=2"
+
+
+def two_pages(server, second_etag='"p2"', second="me/two"):
+    server.add(FIRST_PAGE, json_body=[api_repo("me/one")],
+               headers={"ETag": '"p1"', "Link": f'<{API}{SECOND_PAGE}>; rel="next"'})
+    server.add(SECOND_PAGE, json_body=[api_repo(second)], headers={"ETag": second_etag})
+
+
+async def test_every_page_etag_is_kept(client, server):
+    two_pages(server)
+    listing = await client.list_repos("/user/repos")
+    assert listing.etag == 'pages:"p1"\n"p2"'
+
+
+async def test_unchanged_only_when_every_page_is_unchanged(client, server):
+    server.add(FIRST_PAGE, status=304)
+    server.add(SECOND_PAGE, status=304)
+
+    listing = await client.list_repos("/user/repos", etag='pages:"p1"\n"p2"')
+
+    assert listing.repos is None
+    assert [headers["If-None-Match"] for _, headers in server.requests] == ['"p1"', '"p2"']
+
+
+async def test_a_change_beyond_page_one_refetches_the_list(client, server):
+    server.add(FIRST_PAGE, status=304)
+    server.add(SECOND_PAGE, json_body=[api_repo("me/new-star")], headers={"ETag": '"p2b"'})
+    two_pages(server, second_etag='"p2b"', second="me/new-star")
+
+    listing = await client.list_repos("/user/repos", etag='pages:"p1"\n"p2"')
+
+    assert [repo.full_name for repo in listing.repos] == ["me/one", "me/new-star"]
+    assert listing.etag == 'pages:"p1"\n"p2b"'
+    assert "If-None-Match" not in server.requests[2][1]
+
+
+async def test_a_snapshot_from_an_older_release_is_refetched_once(client, server):
+    two_pages(server)
+
+    listing = await client.list_repos("/user/repos", etag='"only-page-one"')
+
+    assert listing.repos is not None
+    assert "If-None-Match" not in server.requests[0][1]
 
 
 async def test_search_returns_limited_items(client, server):
